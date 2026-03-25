@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>The Grand Budapest Game Parlor</title>
+    <!-- Futura-like font and a classic serif for the Wes Anderson feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #efe6d7;
+            font-family: 'Montserrat', sans-serif;
+            color: #3c2a1f;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        .parlor {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #faf3e4;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1), 0 0 0 8px #e2c7a3, 0 0 0 12px #c49a6c;
+            padding: 2rem 2rem 2.5rem;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 2.2rem;
+            text-align: center;
+            color: #b4652a;
+            border-bottom: 3px double #e2c7a3;
+            display: inline-block;
+            width: auto;
+            margin: 0 auto 1rem;
+            padding-bottom: 8px;
+        }
+
+        .title-wrapper {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #8b5a2b;
+            text-align: center;
+            margin-top: -5px;
+        }
+
+        .game-menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid #ecdbba;
+            padding-bottom: 1.8rem;
+        }
+
+        .game-btn {
+            background: #f1e2ce;
+            border: 2px solid #d6b17e;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 60px;
+            color: #7a4316;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0 #b48b54;
+        }
+
+        .game-btn.active {
+            background: #c49a6c;
+            border-color: #8b5a2b;
+            color: white;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .game-btn:hover {
+            background: #e7cfb3;
+            transform: translateY(-2px);
+        }
+
+        .game-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .game-board-container {
+            flex: 2;
+            min-width: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f5ede2;
+            border-radius: 48px;
+            padding: 2rem 1rem;
+            box-shadow: inset 0 0 0 2px #fff9ef, 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .controls-panel {
+            flex: 1;
+            min-width: 220px;
+            background: #fef7ed;
+            border-radius: 32px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05), inset 0 1px 0 #fffcf5;
+            border: 1px solid #e9d8c2;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0 20px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            background: #e8d9c6;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: #5a3e28;
+            transition: 0.1s;
+        }
+
+        .mode-btn.selected {
+            background: #b68b54;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .status {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-align: center;
+            background: #ebddcd;
+            padding: 12px;
+            border-radius: 50px;
+            margin: 15px 0;
+            color: #4f2f16;
+        }
+
+        .reset-btn {
+            display: block;
+            width: 100%;
+            background: #dbbd97;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 60px;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #35200e;
+            margin-top: 10px;
+            transition: all 0.15s;
+        }
+
+        .reset-btn:hover {
+            background: #c9a66f;
+            transform: scale(0.98);
+        }
+
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            background-color: #deb887;
+            border: 6px solid #b97f44;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 560px;
+            aspect-ratio: 1 / 1;
+        }
+        .chess-square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: 0.05s linear;
+        }
+        .chess-square.light {
+            background-color: #f0e2b6;
+        }
+        .chess-square.dark {
+            background-color: #b5884a;
+        }
+        .chess-square.selected {
+            box-shadow: inset 0 0 0 4px #ffd966, 0 0 0 2px #c9812e;
+            z-index: 2;
+        }
+        .checkers-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            background: #d6a15a;
+            border: 6px solid #9b5e2c;
+            width: 100%;
+            max-width: 560px;
+            aspect-ratio: 1 / 1;
+        }
+        .checker-square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            cursor: pointer;
+        }
+        .checker-dark {
+            background-color: #aa7c4a;
+        }
+        .checker-light {
+            background-color: #f7e9cf;
+        }
+        .ttt-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background-color: #b87a45;
+            padding: 6px;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1 / 1;
+        }
+        .ttt-cell {
+            background: #fef0df;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .c4-board {
+            display: flex;
+            flex-direction: column;
+            background: #2f6b9f;
+            padding: 12px;
+            border-radius: 24px;
+            border: 6px solid #f1cf87;
+            width: 100%;
+            max-width: 560px;
+        }
+        .c4-row {
+            display: flex;
+            justify-content: center;
+        }
+        .c4-cell {
+            background: #faf0d7;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 700px) {
+            .c4-cell { width: 45px; height: 45px; font-size: 1.6rem; margin: 3px; }
+            .chess-square { font-size: 1.8rem; }
+            .checker-square { font-size: 1.8rem; }
+            .ttt-cell { font-size: 2.5rem; }
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.85rem;
+            color: #ad8a62;
+        }
+    </style>
+</head>
+<body>
+<div class="parlor">
+    <div class="title-wrapper">
+        <h1>✦ THE GRAND BUDAPEST GAME PARLOR ✦</h1>
+        <div class="sub">a perfectly symmetrical collection of diversions</div>
+    </div>
+    <div class="game-menu">
+        <button class="game-btn" data-game="chess">♜ CHESS</button>
+        <button class="game-btn" data-game="checkers">♟ CHECKERS</button>
+        <button class="game-btn" data-game="tictactoe">⨉ TIC-TAC-TOE</button>
+        <button class="game-btn" data-game="connect4">● CONNECT FOUR</button>
+    </div>
+
+    <div class="game-layout">
+        <div class="game-board-container" id="boardContainer"></div>
+        <div class="controls-panel" id="controlsPanel">
+            <div id="modeSelector" style="text-align:center"></div>
+            <div id="gameStatus" class="status">Select a game</div>
+            <button id="resetGameBtn" class="reset-btn">⟳ RESET GAME</button>
+        </div>
+    </div>
+    <div class="footer-note">"Mendl's finest games" — play against a friend or the mechanical mind</div>
+</div>
+
+<script>
+    // GLOBALS
+    let currentGame = "chess";
+    let gameMode = "2p";
+    let gameState = null;
+
+    function updateModeUI() {
+        const modeDiv = document.getElementById("modeSelector");
+        if (!modeDiv) return;
+        if (currentGame === "chess" || currentGame === "checkers") {
+            modeDiv.innerHTML = `<div style="font-family: 'Montserrat'; font-weight:600;">🎭 MODE: TWO-PLAYER ONLY</div>`;
+            gameMode = "2p";
+        } else {
+            modeDiv.innerHTML = `
+                <div style="margin-bottom:6px; font-weight:600;">⚙️ GAME MODE</div>
+                <div class="mode-buttons">
+                    <button class="mode-btn ${gameMode === '2p' ? 'selected' : ''}" data-mode="2p">👥 FRIEND</button>
+                    <button class="mode-btn ${gameMode === 'ai' ? 'selected' : ''}" data-mode="ai">🤖 COMPUTER</button>
+                </div>
+            `;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    gameMode = btn.getAttribute('data-mode');
+                    updateModeUI();
+                    resetGameLogic();
+                });
+            });
+        }
+    }
+
+    function resetGameLogic() {
+        if (currentGame === "chess") initChess();
+        else if (currentGame === "checkers") initCheckers();
+        else if (currentGame === "tictactoe") initTicTacToe();
+        else if (currentGame === "connect4") initConnectFour();
+        renderBoard();
+        updateStatus();
+        if ((currentGame === "tictactoe" || currentGame === "connect4") && gameMode === "ai" && getCurrentPlayer() === 'ai') {
+            setTimeout(() => aiMove(), 200);
+        }
+    }
+
+    function getCurrentPlayer() {
+        if (currentGame === "tictactoe") return gameState.currentPlayer;
+        if (currentGame === "connect4") return gameState.currentPlayer;
+        return 'player1';
+    }
+
+    function updateStatus() {
+        const statusDiv = document.getElementById("gameStatus");
+        if (!statusDiv) return;
+        let msg = "";
+        if (currentGame === "chess") {
+            if (gameState.winner) msg = `${gameState.winner === 'w' ? "White" : "Black"} wins! ✨`;
+            else if (gameState.draw) msg = "Stalemate! Draw.";
+            else msg = `${gameState.turn === 'w' ? "White's turn" : "Black's turn"}`;
+        } else if (currentGame === "checkers") {
+            if (gameState.winner) msg = `${gameState.winner === 'r' ? "Red" : "White"} wins! 🏆`;
+            else msg = `${gameState.turn === 'r' ? "Red's turn" : "White's turn"}`;
+        } else if (currentGame === "tictactoe") {
+            if (gameState.winner) msg = `${gameState.winner} wins! 🎬`;
+            else if (gameState.draw) msg = "Draw! Symmetry prevails.";
+            else msg = `${gameState.currentPlayer}'s turn`;
+        } else if (currentGame === "connect4") {
+            if (gameState.winner) msg = `${gameState.winner === 'red' ? "🔴 Red" : "🟡 Yellow"} wins!`;
+            else if (gameState.draw) msg = "Draw! The board is full.";
+            else msg = `${gameState.currentPlayer === 'red' ? "🔴 Red's turn" : "🟡 Yellow's turn"}`;
+        }
+        statusDiv.innerText = msg;
+    }
+
+    // CHESS
+    function initChess() {
+        gameState = {
+            board: [
+                ['r','n','b','q','k','b','n','r'],
+                ['p','p','p','p','p','p','p','p'],
+                ['','','','','','','',''],
+                ['','','','','','','',''],
+                ['','','','','','','',''],
+                ['','','','','','','',''],
+                ['P','P','P','P','P','P','P','P'],
+                ['R','N','B','Q','K','B','N','R']
+            ],
+            turn: 'w',
+            winner: null,
+            draw: false,
+            selected: null
+        };
+    }
+
+    function chessMoves(row, col, board, turn) {
+        const piece = board[row][col];
+        if (!piece) return [];
+        const color = piece === piece.toUpperCase() ? 'w' : 'b';
+        if (color !== turn) return [];
+        const moves = [];
+        const type = piece.toLowerCase();
+        const dir = (color === 'w') ? -1 : 1;
+        
+        if (type === 'p') {
+            const startRow = (color === 'w') ? 6 : 1;
+            const r2 = row + dir;
+            if (r2 >= 0 && r2 < 8 && !board[r2][col]) moves.push([r2, col]);
+            if (row === startRow && !board[row + dir][col] && !board[row + 2 * dir][col]) moves.push([row + 2 * dir, col]);
+            for (const dc of [-1, 1]) {
+                const newCol = col + dc;
+                if (newCol >= 0 && newCol < 8 && r2 >= 0 && r2 < 8 && board[r2][newCol] && (board[r2][newCol].toUpperCase() !== board[r2][newCol] ? 'b' : 'w') !== color) moves.push([r2, newCol]);
+            }
+        } else if (type === 'n') {
+            const offsets = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
+            for (let [dr, dc] of offsets) {
+                const nr = row + dr, nc = col + dc;
+                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && (!board[nr][nc] || (board[nr][nc].toUpperCase() !== board[nr][nc] ? 'b' : 'w') !== color)) moves.push([nr, nc]);
+            }
+        } else if (type === 'r' || type === 'q') {
+            for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+                for (let i = 1; i <= 7; i++) {
+                    const nr = row + dr * i, nc = col + dc * i;
+                    if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+                    if (!board[nr][nc]) moves.push([nr, nc]);
+                    else { if ((board[nr][nc].toUpperCase() !== board[nr][nc] ? 'b' : 'w') !== color) moves.push([nr, nc]); break; }
+                }
+            }
+        } else if (type === 'b' || type === 'q') {
+            for (const [dr, dc] of [[-1, -1], [-1, 1], [1, -1], [1, 1]]) {
+                for (let i = 1; i <= 7; i++) {
+                    const nr = row + dr * i, nc = col + dc * i;
+                    if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+                    if (!board[nr][nc]) moves.push([nr, nc]);
+                    else { if ((board[nr][nc].toUpperCase() !== board[nr][nc] ? 'b' : 'w') !== color) moves.push([nr, nc]); break; }
+                }
+            }
+        } else if (type === 'k') {
+            for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+                if (dr === 0 && dc === 0) continue;
+                const nr = row + dr, nc = col + dc;
+                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && (!board[nr][nc] || (board[nr][nc].toUpperCase() !== board[nr][nc] ? 'b' : 'w') !== color)) moves.push([nr, nc]);
+            }
+        }
+        return moves;
+    }
+
+    function makeChessMove(fromRow, fromCol, toRow, toCol) {
+        let board = gameState.board.map(row => [...row]);
+        const piece = board[fromRow][fromCol];
+        board[toRow][toCol] = piece;
+        board[fromRow][fromCol] = '';
+        if (piece.toLowerCase() === 'p' && (toRow === 0 || toRow === 7)) board[toRow][toCol] = (piece === 'P' ? 'Q' : 'q');
+        gameState.board = board;
+        gameState.turn = gameState.turn === 'w' ? 'b' : 'w';
+        gameState.selected = null;
+        let whiteKing = 0, blackKing = 0;
+        for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { if (gameState.board[i][j] === 'K') whiteKing++; if (gameState.board[i][j] === 'k') blackKing++; }
+        if (whiteKing === 0) gameState.winner = 'b';
+        if (blackKing === 0) gameState.winner = 'w';
+    }
+
+    // CHECKERS
+    function initCheckers() {
+        let board = Array(8).fill().map(() => Array(8).fill(''));
+        for (let i = 0; i < 3; i++) for (let j = 0; j < 8; j++) if ((i + j) % 2 === 1) board[i][j] = 'r';
+        for (let i = 5; i < 8; i++) for (let j = 0; j < 8; j++) if ((i + j) % 2 === 1) board[i][j] = 'w';
+        gameState = { board, turn: 'r', winner: null, selected: null };
+    }
+
+    function checkersMoves(row, col, board, turn) {
+        const piece = board[row][col];
+        if (!piece || piece !== turn) return [];
+        const isKing = piece.toUpperCase() === piece;
+        const dirs = isKing ? [[-1, -1], [-1, 1], [1, -1], [1, 1]] : (turn === 'r' ? [[1, -1], [1, 1]] : [[-1, -1], [-1, 1]]);
+        let moves = [];
+        for (let [dr, dc] of dirs) {
+            let nr = row + dr, nc = col + dc;
+            if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !board[nr][nc]) moves.push([nr, nc]);
+            let jumpR = row + dr * 2, jumpC = col + dc * 2;
+            if (jumpR >= 0 && jumpR < 8 && jumpC >= 0 && jumpC < 8 && board[nr][nc] && board[nr][nc] !== turn && !board[jumpR][jumpC]) moves.push([jumpR, jumpC, 'capture', nr, nc]);
+        }
+        return moves;
+    }
+
+    function makeCheckersMove(fromRow, fromCol, toRow, toCol, captR, captC) {
+        let board = gameState.board.map(r => [...r]);
+        const piece = board[fromRow][fromCol];
+        board[toRow][toCol] = piece;
+        board[fromRow][fromCol] = '';
+        if (captR !== undefined) board[captR][captC] = '';
+        if ((piece === 'r' && toRow === 7) || (piece === 'w' && toRow === 0)) board[toRow][toCol] = piece.toUpperCase();
+        gameState.board = board;
+        gameState.turn = gameState.turn === 'r' ? 'w' : 'r';
+        gameState.selected = null;
+        let rCount = 0, wCount = 0;
+        for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { if (gameState.board[i][j] === 'r' || gameState.board[i][j] === 'R') rCount++; if (gameState.board[i][j] === 'w' || gameState.board[i][j] === 'W') wCount++; }
+        if (rCount === 0) gameState.winner = 'w';
+        if (wCount === 0) gameState.winner = 'r';
+    }
+
+    // TIC-TAC-TOE
+    function initTicTacToe() {
+        gameState = { board: Array(9).fill(''), currentPlayer: 'X', winner: null, draw: false };
+    }
+
+    function tttMakeMove(idx) {
+        if (gameState.winner || gameState.draw || gameState.board[idx] !== '') return false;
+        gameState.board[idx] = gameState.currentPlayer;
+        checkTicTacToeWinner();
+        if (!gameState.winner && !gameState.draw) gameState.currentPlayer = (gameState.currentPlayer === 'X' ? 'O' : 'X');
+        return true;
+    }
+
+    function checkTicTacToeWinner() {
+        const lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+        for (let l of lines) {
+            if (gameState.board[l[0]] && gameState.board[l[0]] === gameState.board[l[1]] && gameState.board[l[1]] === gameState.board[l[2]]) {
+                gameState.winner = gameState.board[l[0]];
+                return;
+            }
+        }
+        if (gameState.board.every(cell => cell !== '')) gameState.draw = true;
+    }
+
+    function minimax(board, isMax) {
+        let winner = null;
+        const lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+        for (let l of lines) if (board[l[0]] && board[l[0]] === board[l[1]] && board[l[1]] === board[l[2]]) winner = board[l[0]];
+        if (winner === 'X') return -10;
+        if (winner === 'O') return 10;
+        if (board.every(c => c !== '')) return 0;
+        if (isMax) {
+            let best = -Infinity;
+            for (let i = 0; i < 9; i++) if (board[i] === '') { board[i] = 'O'; best = Math.max(best, minimax(board, false)); board[i] = ''; }
+            return best;
+        } else {
+            let best = Infinity;
+            for (let i = 0; i < 9; i++) if (board[i] === '') { board[i] = 'X'; best = Math.min(best, minimax(board, true)); board[i] = ''; }
+            return best;
+        }
+    }
+
+    function tttAIMove() {
+        if (gameState.winner || gameState.draw || gameState.currentPlayer !== 'O') return;
+        let bestScore = -Infinity, bestMove = -1;
+        for (let i = 0; i < 9; i++) if (gameState.board[i] === '') {
+            gameState.board[i] = 'O';
+            let score = minimax(gameState.board, false);
+            gameState.board[i] = '';
+            if (score > bestScore) { bestScore = score; bestMove = i; }
+        }
+        if (bestMove !== -1) tttMakeMove(bestMove);
+        renderBoard(); updateStatus();
+    }
+
+    // CONNECT FOUR
+    function initConnectFour() {
+        gameState = { board: Array(6).fill().map(() => Array(7).fill('')), currentPlayer: 'red', winner: null, draw: false };
+    }
+
+    function c4MakeMove(col) {
+        if (gameState.winner || gameState.draw) return false;
+        for (let row = 5; row >= 0; row--) if (gameState.board[row][col] === '') {
+            gameState.board[row][col] = gameState.currentPlayer;
+            if (checkWinConnectFour(row, col, gameState.currentPlayer)) gameState.winner = gameState.currentPlayer;
+            else if (isBoardFullC4()) gameState.draw = true;
+            else gameState.currentPlayer = (gameState.currentPlayer === 'red' ? 'yellow' : 'red');
+            return true;
+        }
+        return false;
+    }
+
+    function checkWinConnectFour(row, col, player) {
+        const directions = [[1, 0], [0, 1], [1, 1], [1, -1]];
+        for (let [dr, dc] of directions) {
+            let count = 1;
+            for (let step = 1; step <= 3; step++) { let nr = row + dr * step, nc = col + dc * step; if (nr < 0 || nr >= 6 || nc < 0 || nc >= 7 || gameState.board[nr][nc] !== player) break; count++; }
+            for (let step = 1; step <= 3; step++) { let nr = row - dr * step, nc = col - dc * step; if (nr < 0 || nr >= 6 || nc < 0 || nc >= 7 || gameState.board[nr][nc] !== player) break; count++; }
+            if (count >= 4) return true;
+        }
+        return false;
+    }
+
+    function isBoardFullC4() { return gameState.board.every(row => row.every(cell => cell !== '')); }
+
+    function c4AIMove() {
+        if (gameState.winner || gameState.draw || gameState.currentPlayer !== 'yellow') return;
+        for (let col = 0; col < 7; col++) {
+            for (let row = 5; row >= 0; row--) if (gameState.board[row][col] === '') {
+                gameState.board[row][col] = 'yellow';
+                if (checkWinConnectFour(row, col, 'yellow')) { gameState.board[row][col] = ''; c4MakeMove(col); renderBoard(); updateStatus(); return; }
+                gameState.board[row][col] = '';
+                break;
+            }
+        }
+        for (let col = 0; col < 7; col++) {
+            for (let row = 5; row >= 0; row--) if (gameState.board[row][col] === '') {
+                gameState.board[row][col] = 'red';
+                if (checkWinConnectFour(row, col, 'red')) { gameState.board[row][col] = ''; c4MakeMove(col); renderBoard(); updateStatus(); return; }
+                gameState.board[row][col] = '';
+                break;
+            }
+        }
+        let emptyCols = [];
+        for (let c = 0; c < 7; c++) if (gameState.board[0][c] === '') emptyCols.push(c);
+        if (emptyCols.length) c4MakeMove(emptyCols[Math.floor(Math.random() * emptyCols.length)]);
+        renderBoard(); updateStatus();
+    }
+
+    function aiMove() {
+        if (currentGame === "tictactoe") tttAIMove();
+        else if (currentGame === "connect4") c4AIMove();
+        renderBoard();
+        updateStatus();
+    }
+
+    // RENDER FUNCTIONS
+    function renderBoard() {
+        const container = document.getElementById("boardContainer");
+        if (!container) return;
+        if (currentGame === "chess") renderChess(container);
+        else if (currentGame === "checkers") renderCheckers(container);
+        else if (currentGame === "tictactoe") renderTicTacToe(container);
+        else if (currentGame === "connect4") renderConnectFour(container);
+    }
+
+    function renderChess(container) {
+        let html = '<div class="chess-board">';
+        for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+            let piece = gameState.board[i][j];
+            let symbol = { 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 'P': '♟' }[piece] || '';
+            const isSelected = gameState.selected && gameState.selected[0] === i && gameState.selected[1] === j;
+            html += `<div class="chess-square ${(i + j) % 2 === 0 ? 'light' : 'dark'} ${isSelected ? 'selected' : ''}" data-row="${i}" data-col="${j}">${symbol}</div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+        attachChessEvents();
+    }
+
+    function attachChessEvents() {
+        document.querySelectorAll('.chess-square').forEach(sq => {
+            sq.addEventListener('click', (e) => {
+                if (gameState.winner || gameState.draw) return;
+                const row = parseInt(sq.dataset.row), col = parseInt(sq.dataset.col);
+                if (gameState.selected === null) {
+                    const piece = gameState.board[row][col];
+                    if (piece && ((gameState.turn === 'w' && piece === piece.toUpperCase()) || (gameState.turn === 'b' && piece !== piece.toUpperCase()))) gameState.selected = [row, col];
+                    renderBoard();
+                } else {
+                    let [fromRow, fromCol] = gameState.selected;
+                    let moves = chessMoves(fromRow, fromCol, gameState.board, gameState.turn);
+                    let valid = moves.some(([r, c]) => r === row && c === col);
+                    if (valid) makeChessMove(fromRow, fromCol, row, col);
+                    gameState.selected = null;
+                    renderBoard();
+                    updateStatus();
+                }
+            });
+        });
+    }
+
+    function renderCheckers(container) {
+        let html = '<div class="checkers-board">';
+        for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+            let piece = gameState.board[i][j];
+            let sym = piece === 'r' ? '🔴' : piece === 'w' ? '⚪' : piece === 'R' ? '👑🔴' : piece === 'W' ? '👑⚪' : '';
+            html += `<div class="checker-square ${(i + j) % 2 === 0 ? 'checker-light' : 'checker-dark'}" data-row="${i}" data-col="${j}">${sym}</div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+        attachCheckersEvents();
+    }
+
+    function attachCheckersEvents() {
+        document.querySelectorAll('.checker-square').forEach(sq => {
+            sq.addEventListener('click', (e) => {
+                if (gameState.winner) return;
+                const row = parseInt(sq.dataset.row), col = parseInt(sq.dataset.col);
+                if (gameState.selected === null) {
+                    const piece = gameState.board[row][col];
+                    if (piece && piece === gameState.turn) gameState.selected = [row, col];
+                    renderBoard();
+                } else {
+                    let [fromRow, fromCol] = gameState.selected;
+                    let moves = checkersMoves(fromRow, fromCol, gameState.board, gameState.turn);
+                    let validMove = null;
+                    for (let m of moves) if (m[0] === row && m[1] === col) { validMove = m; break; }
+                    if (validMove) makeCheckersMove(fromRow, fromCol, validMove[0], validMove[1], validMove[3], validMove[4]);
+                    gameState.selected = null;
+                    renderBoard();
+                    updateStatus();
+                }
+            });
+        });
+    }
+
+    function renderTicTacToe(container) {
+        let html = '<div class="ttt-grid">';
+        for (let i = 0; i < 9; i++) {
+            html += `<div class="ttt-cell" data-idx="${i}">${gameState.board[i]}</div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+        attachTicTacToeEvents();
+    }
+
+    function attachTicTacToeEvents() {
+        if (gameState.winner || gameState.draw) return;
+        document.querySelectorAll('.ttt-cell').forEach(cell => {
+            cell.addEventListener('click', (e) => {
+                const idx = parseInt(cell.dataset.idx);
+                if (gameState.board[idx] !== '' || gameState.winner || gameState.draw) return;
+                if (gameMode === "ai" && gameState.currentPlayer !== 'X') return;
+                tttMakeMove(idx);
+                renderBoard();
+                updateStatus();
+                if (!gameState.winner && !gameState.draw && gameMode === "ai" && gameState.currentPlayer === 'O') {
+                    setTimeout(() => { tttAIMove(); renderBoard(); updateStatus(); }, 100);
+                }
+            });
+        });
+    }
+
+    function renderConnectFour(container) {
+        let html = '<div class="c4-board">';
+        for (let row = 0; row < 6; row++) {
+            html += '<div class="c4-row">';
+            for (let col = 0; col < 7; col++) {
+                let val = gameState.board[row][col];
+                let display = val === 'red' ? '🔴' : val === 'yellow' ? '🟡' : '⚪';
+                html += `<div class="c4-cell" data-col="${col}">${display}</div>`;
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        container.innerHTML = html;
+        attachConnectFourEvents();
+    }
+
+    function attachConnectFourEvents() {
+        if (gameState.winner || gameState.draw) return;
+        document.querySelectorAll('.c4-cell').forEach(cell => {
+            cell.addEventListener('click', (e) => {
+                const col = parseInt(cell.dataset.col);
+                if (gameState.winner || gameState.draw) return;
+                if (gameMode === "ai" && gameState.currentPlayer !== 'red') return;
+                if (gameState.board[0][col] !== '') return;
+                c4MakeMove(col);
+                renderBoard();
+                updateStatus();
+                if (!gameState.winner && !gameState.draw && gameMode === "ai" && gameState.currentPlayer === 'yellow') {
+                    setTimeout(() => { c4AIMove(); renderBoard(); updateStatus(); }, 100);
+                }
+            });
+        });
+    }
+
+    // SWITCH GAME
+    function switchGame(game) {
+        currentGame = game;
+        gameMode = (game === "chess" || game === "checkers") ? "2p" : "2p";
+        updateModeUI();
+        resetGameLogic();
+        document.querySelectorAll('.game-btn').forEach(btn => {
+            if (btn.dataset.game === game) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+    }
+
+    // EVENT LISTENERS
+    document.querySelectorAll('.game-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchGame(btn.dataset.game));
+    });
+    document.getElementById('resetGameBtn').addEventListener('click', () => resetGameLogic());
+
+    // INITIALIZE
+    initChess();
+    updateModeUI();
+    renderBoard();
+    updateStatus();
+    document.querySelector('.game-btn[data-game="chess"]').classList.add('active');
+</script>
+</body>
+</html>
